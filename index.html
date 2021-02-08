@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Temperature Hot</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background: url(images/bg-image.jpg) no-repeat;
+            background-size: cover;
+            height: 100vh;
+        }
+
+        #error-area h1 {
+            text-align: center;
+            font-size: 60px;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <form class="col-md-6 m-auto py-5">
+            <div class="input-group mb-3">
+                <input id="city" type="text" class="form-control" placeholder="Enter a location for Weather ...">
+                <div class="input-group-append">
+                    <button id="search-btn" onclick="showTemp()" type="button" class="btn btn-danger">Search</button>
+                </div>
+            </div>
+        </form>
+        <div id="weather-status-box">
+            <div class="weather-status text-white text-center">
+                <img id="weather-icon" src="https://openweathermap.org/img/wn/02d@2x.png" alt="">
+                <!-- <img src="https://openweathermap.org/img/wn/02d@2x.png" alt=""> -->
+                <h1 id="show-city-name">Undefine Area</h1>
+                <h3><span id="show-temp">00</span>&deg;C</h3>
+                <h1 id="weather-type" class="lead"></h1>
+            </div>
+        </div>
+
+        <div id="error-area">
+
+        </div>
+
+    </div>
+
+    <script>
+
+
+        function showTemp() {
+            const inputCity = document.getElementById('city').value;
+            const cityLink = 'https://api.openweathermap.org/data/2.5/weather?q=' + inputCity + '&appid=b71a503b19f76c596f18a1e6784b655e'
+            fetch(cityLink)
+                .then(response => response.json())
+                .then(data => {
+                    getData(data);
+                })
+                .catch(() => showError())
+        }
+
+        function showError() {
+            const errorArea = document.getElementById('error-area');
+            errorArea.innerHTML = '<h1>City is not found...!';
+            document.getElementById('error-area').style.display = 'block';
+            document.getElementById('weather-status-box').style.display = 'none';
+        }
+
+        function getData(data) {
+            const countryName = data.sys.country;
+            const cityName = data.name;
+            const temperature = Math.round(data.main.temp - 273.15);
+            const weatherType = data.weather[0].main;
+            const weatherIconId = data.weather[0].icon;
+            const weatherIconImage = 'https://openweathermap.org/img/wn/' + weatherIconId + '@2x.png'
+            document.getElementById('weather-icon').src = weatherIconImage;
+            document.getElementById('show-city-name').innerText = cityName;
+            document.getElementById('show-temp').innerText = temperature;
+            document.getElementById('weather-type').innerText = weatherType;
+            document.getElementById('error-area').style.display = 'none';
+            document.getElementById('weather-status-box').style.display = 'block';
+        }
+
+        document.getElementById('city').addEventListener('keypress', function (event) {
+            if (event.keyCode == 13) {
+                event.preventDefault();
+                document.getElementById('search-btn').click();
+            }
+        });
+
+    </script>
+
+</body>
+
+</html>
